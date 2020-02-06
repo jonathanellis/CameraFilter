@@ -1,6 +1,6 @@
-attribute vec2  vPosition;
-attribute vec2  vTexCoord;
-varying vec2    texCoord;
+attribute vec2  vPosition; // position
+attribute vec2  vTexCoord; // inputTextureCoordinate
+varying vec2    texCoord; // textureCoordinate
 
 void main() {
     texCoord = vTexCoord;

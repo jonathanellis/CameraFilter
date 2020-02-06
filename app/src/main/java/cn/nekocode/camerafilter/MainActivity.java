@@ -90,24 +90,6 @@ public class MainActivity extends AppCompatActivity {
         container.addView(textureView);
         textureView.setSurfaceTextureListener(renderer);
 
-        // Show original frame when touch the view
-        textureView.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        renderer.setSelectedFilter(R.id.filter0);
-                        break;
-
-                    case MotionEvent.ACTION_UP:
-                    case MotionEvent.ACTION_CANCEL:
-                        renderer.setSelectedFilter(filterId);
-                        break;
-                }
-                return true;
-            }
-        });
-
         textureView.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
             @Override
             public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
@@ -136,9 +118,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
         setTitle(item.getTitle());
-
-        if (renderer != null)
-            renderer.setSelectedFilter(filterId);
 
         return true;
     }

@@ -106,16 +106,16 @@ public abstract class CameraFilter {
         // Use shaders
         GLES20.glUseProgram(PROGRAM);
 
-        int iChannel0Location = GLES20.glGetUniformLocation(PROGRAM, "iChannel0");
+        int iChannel0Location = GLES20.glGetUniformLocation(PROGRAM, "inputImageTexture");
         GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
         GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, cameraTexId);
         GLES20.glUniform1i(iChannel0Location, 0);
 
-        int vPositionLocation = GLES20.glGetAttribLocation(PROGRAM, "vPosition");
+        int vPositionLocation = GLES20.glGetAttribLocation(PROGRAM, "position");
         GLES20.glEnableVertexAttribArray(vPositionLocation);
         GLES20.glVertexAttribPointer(vPositionLocation, 2, GLES20.GL_FLOAT, false, 4 * 2, VERTEX_BUF);
 
-        int vTexCoordLocation = GLES20.glGetAttribLocation(PROGRAM, "vTexCoord");
+        int vTexCoordLocation = GLES20.glGetAttribLocation(PROGRAM, "inputTextureCoordinate");
         GLES20.glEnableVertexAttribArray(vTexCoordLocation);
         GLES20.glVertexAttribPointer(vTexCoordLocation, 2, GLES20.GL_FLOAT, false, 4 * 2, ROATED_TEXTURE_COORD_BUF);
 
@@ -131,51 +131,52 @@ public abstract class CameraFilter {
         iFrame++;
     }
 
-    abstract void onDraw(int cameraTexId, int canvasWidth, int canvasHeight);
+    public abstract void onDraw(int cameraTexId, int canvasWidth, int canvasHeight);
 
-    void setupShaderInputs(int program, int[] iResolution, int[] iChannels, int[][] iChannelResolutions) {
+    protected void setupShaderInputs(int program, int[] iResolution, int[] iChannels, int[][] iChannelResolutions) {
         setupShaderInputs(program, VERTEX_BUF, TEXTURE_COORD_BUF, iResolution, iChannels, iChannelResolutions);
     }
 
     void setupShaderInputs(int program, FloatBuffer vertex, FloatBuffer textureCoord, int[] iResolution, int[] iChannels, int[][] iChannelResolutions) {
         GLES20.glUseProgram(program);
 
-        int iResolutionLocation = GLES20.glGetUniformLocation(program, "iResolution");
-        GLES20.glUniform3fv(iResolutionLocation, 1,
-                FloatBuffer.wrap(new float[]{(float) iResolution[0], (float) iResolution[1], 1.0f}));
+//        int iResolutionLocation = GLES20.glGetUniformLocation(program, "uWindow");
+//        GLES20.glUniform3fv(iResolutionLocation, 1,
+//                FloatBuffer.wrap(new float[]{(float) iResolution[0], (float) iResolution[1], 1.0f}));
+//
+//        float time = ((float) (System.currentTimeMillis() - START_TIME)) / 1000.0f;
+//        int iGlobalTimeLocation = GLES20.glGetUniformLocation(program, "iGlobalTime");
+//        GLES20.glUniform1f(iGlobalTimeLocation, time);
+//
+//        int iFrameLocation = GLES20.glGetUniformLocation(program, "iFrame");
+//        GLES20.glUniform1i(iFrameLocation, iFrame);
 
-        float time = ((float) (System.currentTimeMillis() - START_TIME)) / 1000.0f;
-        int iGlobalTimeLocation = GLES20.glGetUniformLocation(program, "iGlobalTime");
-        GLES20.glUniform1f(iGlobalTimeLocation, time);
-
-        int iFrameLocation = GLES20.glGetUniformLocation(program, "iFrame");
-        GLES20.glUniform1i(iFrameLocation, iFrame);
-
-        int vPositionLocation = GLES20.glGetAttribLocation(program, "vPosition");
+        int vPositionLocation = GLES20.glGetAttribLocation(program, "position");
         GLES20.glEnableVertexAttribArray(vPositionLocation);
         GLES20.glVertexAttribPointer(vPositionLocation, 2, GLES20.GL_FLOAT, false, 4 * 2, vertex);
 
-        int vTexCoordLocation = GLES20.glGetAttribLocation(program, "vTexCoord");
+        int vTexCoordLocation = GLES20.glGetAttribLocation(program, "inputTextureCoordinate");
         GLES20.glEnableVertexAttribArray(vTexCoordLocation);
         GLES20.glVertexAttribPointer(vTexCoordLocation, 2, GLES20.GL_FLOAT, false, 4 * 2, textureCoord);
 
         for (int i = 0; i < iChannels.length; i++) {
-            int sTextureLocation = GLES20.glGetUniformLocation(program, "iChannel" + i);
+            String textureName = (i == 0) ? "inputImageTexture" : "inputImageTexture" + (i+1);
+            int sTextureLocation = GLES20.glGetUniformLocation(program, textureName);
             GLES20.glActiveTexture(GLES20.GL_TEXTURE0 + i);
             GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, iChannels[i]);
             GLES20.glUniform1i(sTextureLocation, i);
         }
 
-        float _iChannelResolutions[] = new float[iChannelResolutions.length * 3];
-        for (int i = 0; i < iChannelResolutions.length; i++) {
-            _iChannelResolutions[i * 3] = iChannelResolutions[i][0];
-            _iChannelResolutions[i * 3 + 1] = iChannelResolutions[i][1];
-            _iChannelResolutions[i * 3 + 2] = 1.0f;
-        }
-
-        int iChannelResolutionLocation = GLES20.glGetUniformLocation(program, "iChannelResolution");
-        GLES20.glUniform3fv(iChannelResolutionLocation,
-                _iChannelResolutions.length, FloatBuffer.wrap(_iChannelResolutions));
+//        float _iChannelResolutions[] = new float[iChannelResolutions.length * 3];
+//        for (int i = 0; i < iChannelResolutions.length; i++) {
+//            _iChannelResolutions[i * 3] = iChannelResolutions[i][0];
+//            _iChannelResolutions[i * 3 + 1] = iChannelResolutions[i][1];
+//            _iChannelResolutions[i * 3 + 2] = 1.0f;
+//        }
+//
+//        int iChannelResolutionLocation = GLES20.glGetUniformLocation(program, "iChannelResolution");
+//        GLES20.glUniform3fv(iChannelResolutionLocation,
+//                _iChannelResolutions.length, FloatBuffer.wrap(_iChannelResolutions));
     }
 
     public static void release() {
