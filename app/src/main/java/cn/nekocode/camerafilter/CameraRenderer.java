@@ -33,9 +33,9 @@ import javax.microedition.khronos.egl.EGLDisplay;
 import javax.microedition.khronos.egl.EGLSurface;
 
 import cn.nekocode.camerafilter.filter.Filter;
-import cn.nekocode.camerafilter.filter.Operation;
 import cn.nekocode.camerafilter.filter.FilterGroup;
-import cn.nekocode.camerafilter.filter.iproov.Shaders;
+import cn.nekocode.camerafilter.filter.Operation;
+import cn.nekocode.camerafilter.filter.Shaders;
 
 /**
  * @author nekocode (nekocode.cn@gmail.com)
@@ -125,13 +125,13 @@ public class CameraRenderer implements Runnable, TextureView.SurfaceTextureListe
                 .setFloatVec2("uWindow", new float[] { -gwidth, -gheight })
                 .setFloat("threshold", 1.0f);
 
-//        selectedFilter = new FilterGroup(
-//                luminanceFilter,
-//                horizontalBlurFilter,
-//                verticalBlurFilter,
-//                sobelFilter);
-
-        selectedFilter = horizontalBlurFilter;
+        selectedFilter = new FilterGroup(
+                luminanceFilter,
+                horizontalBlurFilter,
+                verticalBlurFilter,
+                sobelFilter);
+//
+//        selectedFilter = horizontalBlurFilter;
 
         selectedFilter.onAttach();
 

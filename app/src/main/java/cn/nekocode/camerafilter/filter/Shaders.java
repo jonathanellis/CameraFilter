@@ -1,4 +1,4 @@
-package cn.nekocode.camerafilter.filter.iproov;
+package cn.nekocode.camerafilter.filter;
 
 public class Shaders {
     private Shaders(){}

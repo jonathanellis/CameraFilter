@@ -24,9 +24,7 @@ import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 
 import cn.nekocode.camerafilter.MyGLUtils;
-import cn.nekocode.camerafilter.R;
 import cn.nekocode.camerafilter.RenderBuffer;
-import cn.nekocode.camerafilter.filter.iproov.Shaders;
 
 /**
  * @author nekocode (nekocode.cn@gmail.com)
@@ -90,8 +88,7 @@ public abstract class Operation {
         if (BASE_PROGRAM == 0) {
             BASE_PROGRAM = MyGLUtils.buildProgram(Shaders.DEFAULT_VERTEX_SHADER, Shaders.DEFAULT_FRAG_SHADER);
         }
-
-
+        
     }
 
     @CallSuper
