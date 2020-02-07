@@ -36,6 +36,7 @@ import cn.nekocode.camerafilter.filter.Filter;
 import cn.nekocode.camerafilter.filter.FilterGroup;
 import cn.nekocode.camerafilter.filter.Operation;
 import cn.nekocode.camerafilter.filter.Shaders;
+import cn.nekocode.camerafilter.filter.TwoInputFilter;
 
 /**
  * @author nekocode (nekocode.cn@gmail.com)
@@ -137,13 +138,18 @@ public class CameraRenderer implements Runnable, TextureView.SurfaceTextureListe
                 .setFloatVec2("uWindow", new float[] { -gwidth, -gheight })
                 .setFloat("threshold", 1.0f);
 
+        Filter shadeFilter = new TwoInputFilter(Shaders.NO_FILTER_VERTEX_SHADER, Shaders.ShadeShader, Operation.getCameraRenderBuf())
+                .setFloatVec4("blend", new float[] { 1f, 1f, 1f, 0.5f })
+                .setFloatVec4("fade", new float[] { 2.3f, 2.8f, 2.3f, 1f });
+
         selectedFilter = new FilterGroup(
                 luminanceFilter,
                 horizontalBlurFilter,
                 verticalBlurFilter,
                 sobelFilter,
                 suppressionFilter,
-                inclusionFilter);
+                inclusionFilter,
+                shadeFilter);
 //
 //        selectedFilter = horizontalBlurFilter;
 

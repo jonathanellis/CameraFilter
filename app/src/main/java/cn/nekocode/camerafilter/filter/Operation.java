@@ -18,6 +18,7 @@ package cn.nekocode.camerafilter.filter;
 import android.opengl.GLES11Ext;
 import android.opengl.GLES20;
 import android.support.annotation.CallSuper;
+import android.widget.ProgressBar;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -88,7 +89,7 @@ public abstract class Operation {
         if (BASE_PROGRAM == 0) {
             BASE_PROGRAM = MyGLUtils.buildProgram(Shaders.DEFAULT_VERTEX_SHADER, Shaders.DEFAULT_FRAG_SHADER);
         }
-        
+
     }
 
     @CallSuper
@@ -187,5 +188,8 @@ public abstract class Operation {
         CAMERA_RENDER_BUF = null;
     }
 
+    public static RenderBuffer getCameraRenderBuf() {
+        return CAMERA_RENDER_BUF;
+    }
 
 }

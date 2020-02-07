@@ -9,10 +9,10 @@ import cn.nekocode.camerafilter.MyGLUtils;
 
 public class Filter extends Operation {
 
-    private int program;
+    protected int program;
     private final ConcurrentLinkedQueue<Runnable> runOnDraw = new ConcurrentLinkedQueue<>();
 
-    private Filter(String vertexShader, String fragmentShader) {
+    protected Filter(String vertexShader, String fragmentShader) {
         program = MyGLUtils.buildProgram(vertexShader, fragmentShader);
     }
 
@@ -20,10 +20,8 @@ public class Filter extends Operation {
         return new Filter(vertexShader, fragmentShader);
     }
 
-    private void runOnDraw(final Runnable runnable) {
-        //Changed LinkedList to ConcurrentLinkedQueue
+    private void runOnDraw(Runnable runnable) {
         runOnDraw.add(runnable);
-
     }
 
     public Filter setFloat(final String name, final float value) {
@@ -49,6 +47,18 @@ public class Filter extends Operation {
         return this;
     }
 
+
+    public Filter setFloatVec4(final String name, final float[] value) {
+        runOnDraw(new Runnable() {
+            @Override
+            public void run() {
+                int location = GLES20.glGetUniformLocation(program, name);
+                GLES20.glUniform4fv(location, 1, FloatBuffer.wrap(value));
+            }
+        });
+        return this;
+    }
+
     private void runPendingOnDrawTasks() {
         while (!runOnDraw.isEmpty()) {
             runOnDraw.poll().run();
@@ -63,6 +73,10 @@ public class Filter extends Operation {
                 new int[][]{});
 
         runPendingOnDrawTasks();
+    }
+
+    public int getId() {
+        return program;
     }
 
 }
