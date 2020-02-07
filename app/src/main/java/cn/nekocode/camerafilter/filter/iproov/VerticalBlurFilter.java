@@ -25,8 +25,7 @@ public class VerticalBlurFilter extends CameraFilter {
                 new int[][]{});
 
         int location = GLES20.glGetUniformLocation(program, "v");
-        GLES20.glUniform1f(location, 0.05f);
+        GLES20.glUniform1f(location, 0.005f);
 
-        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);
     }
 }

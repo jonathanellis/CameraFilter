@@ -4,18 +4,17 @@ import android.content.Context;
 import android.opengl.GLES20;
 
 import cn.nekocode.camerafilter.MyGLUtils;
-import cn.nekocode.camerafilter.R;
 import cn.nekocode.camerafilter.filter.CameraFilter;
 
-public class HorizontalBlurFilter extends CameraFilter {
+public class LuminanceFilter extends CameraFilter {
 
     private int program;
 
-    public HorizontalBlurFilter(Context context) {
+    public LuminanceFilter(Context context) {
         super(context);
 
         // Build shaders
-        program = MyGLUtils.buildProgram(Shaders.NO_FILTER_VERTEX_SHADER, Shaders.HorizontalBlurShader);
+        program = MyGLUtils.buildProgram(Shaders.NO_FILTER_VERTEX_SHADER, Shaders.LuminanceShader);
     }
 
     @Override
@@ -24,9 +23,6 @@ public class HorizontalBlurFilter extends CameraFilter {
                 new int[]{canvasWidth, canvasHeight},
                 new int[]{cameraTexId},
                 new int[][]{});
-
-        int location = GLES20.glGetUniformLocation(program, "h");
-        GLES20.glUniform1f(location, 0.005f);
 
     }
 }

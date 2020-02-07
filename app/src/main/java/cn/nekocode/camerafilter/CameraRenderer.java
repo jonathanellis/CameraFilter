@@ -55,8 +55,11 @@ import cn.nekocode.camerafilter.filter.PolygonizationFilter;
 import cn.nekocode.camerafilter.filter.RefractionFilter;
 import cn.nekocode.camerafilter.filter.TileMosaicFilter;
 import cn.nekocode.camerafilter.filter.TrianglesMosaicFilter;
+import cn.nekocode.camerafilter.filter.iproov.FilterGroup;
 import cn.nekocode.camerafilter.filter.iproov.HorizontalBlurFilter;
+import cn.nekocode.camerafilter.filter.iproov.LuminanceFilter;
 import cn.nekocode.camerafilter.filter.iproov.TransformationFilter;
+import cn.nekocode.camerafilter.filter.iproov.VerticalBlurFilter;
 
 /**
  * @author nekocode (nekocode.cn@gmail.com)
@@ -134,7 +137,11 @@ public class CameraRenderer implements Runnable, TextureView.SurfaceTextureListe
     public void run() {
         initGL(surfaceTexture);
 
-        selectedFilter = new HorizontalBlurFilter(context);
+        selectedFilter = new FilterGroup(context,
+                new LuminanceFilter(context),
+                new HorizontalBlurFilter(context),
+                new VerticalBlurFilter(context));
+
         selectedFilter.onAttach();
 
         // Create texture for camera preview

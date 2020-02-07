@@ -94,7 +94,7 @@ public abstract class CameraFilter {
         iFrame = 0;
     }
 
-    final public void draw(int cameraTexId, int canvasWidth, int canvasHeight) {
+    final public void draw(int textureId, int canvasWidth, int canvasHeight) {
         // TODO move?
         // Create camera render buffer
         if (CAMERA_RENDER_BUF == null ||
@@ -108,7 +108,7 @@ public abstract class CameraFilter {
 
         int iChannel0Location = GLES20.glGetUniformLocation(PROGRAM, "inputImageTexture");
         GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
-        GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, cameraTexId);
+        GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, textureId);
         GLES20.glUniform1i(iChannel0Location, 0);
 
         int vPositionLocation = GLES20.glGetAttribLocation(PROGRAM, "position");
@@ -126,18 +126,20 @@ public abstract class CameraFilter {
         CAMERA_RENDER_BUF.unbind();
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 
-        onDraw(CAMERA_RENDER_BUF.getTexId(), canvasWidth, canvasHeight);
+        onDraw(CAMERA_RENDER_BUF.getTexId(), canvasWidth, canvasHeight); // <<----- CALL DOWN TO SUBCLASS
+
+        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);
 
         iFrame++;
     }
 
     public abstract void onDraw(int cameraTexId, int canvasWidth, int canvasHeight);
 
-    protected void setupShaderInputs(int program, int[] iResolution, int[] iChannels, int[][] iChannelResolutions) {
+    protected static void setupShaderInputs(int program, int[] iResolution, int[] iChannels, int[][] iChannelResolutions) {
         setupShaderInputs(program, VERTEX_BUF, TEXTURE_COORD_BUF, iResolution, iChannels, iChannelResolutions);
     }
 
-    void setupShaderInputs(int program, FloatBuffer vertex, FloatBuffer textureCoord, int[] iResolution, int[] iChannels, int[][] iChannelResolutions) {
+    static void setupShaderInputs(int program, FloatBuffer vertex, FloatBuffer textureCoord, int[] iResolution, int[] iChannels, int[][] iChannelResolutions) {
         GLES20.glUseProgram(program);
 
 //        int iResolutionLocation = GLES20.glGetUniformLocation(program, "uWindow");

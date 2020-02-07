@@ -13,7 +13,6 @@ public class TransformationFilter extends CameraFilter {
     private int program;
     private static final float[] MATRIX = getRotationMatrix(80); // {-1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f}; // getRotationMatrix(90);
 
-
     private static float[] getRotationMatrix(int angle) {
 
         double t = Math.toRadians(angle);
@@ -61,6 +60,5 @@ public class TransformationFilter extends CameraFilter {
         int location = GLES20.glGetUniformLocation(program, "transformMatrix");
         GLES20.glUniformMatrix4fv(location, 1, false, MATRIX, 0);
 
-        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);
     }
 }
