@@ -49,8 +49,7 @@ public class Filter extends Operation {
         return this;
     }
 
-    protected void runPendingOnDrawTasks() {
-        //Changed LinkedList to ConcurrentLinkedQueue
+    private void runPendingOnDrawTasks() {
         while (!runOnDraw.isEmpty()) {
             runOnDraw.poll().run();
         }

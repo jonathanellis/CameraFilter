@@ -113,6 +113,8 @@ public class CameraRenderer implements Runnable, TextureView.SurfaceTextureListe
     public void run() {
         initGL(surfaceTexture);
 
+        float CANNY_LINE_WIDTH = 2.0f;
+
         Filter luminanceFilter = Filter.create(Shaders.NO_FILTER_VERTEX_SHADER, Shaders.LuminanceShader);
 
         Filter horizontalBlurFilter = Filter.create(Shaders.NO_FILTER_VERTEX_SHADER, Shaders.HorizontalBlurShader)
@@ -125,11 +127,23 @@ public class CameraRenderer implements Runnable, TextureView.SurfaceTextureListe
                 .setFloatVec2("uWindow", new float[] { -gwidth, -gheight })
                 .setFloat("threshold", 1.0f);
 
+        Filter suppressionFilter = Filter.create(Shaders.NO_FILTER_VERTEX_SHADER, Shaders.SuppressionShader)
+                .setFloat("upperThreshold", 0.15f)
+                .setFloat("lowerThreshold", 0.1f)
+                .setFloat("textHeight", CANNY_LINE_WIDTH / -gwidth)
+                .setFloat("texelWidth", CANNY_LINE_WIDTH / -gheight);
+
+        Filter inclusionFilter = Filter.create(Shaders.NO_FILTER_VERTEX_SHADER, Shaders.InclusionShader)
+                .setFloatVec2("uWindow", new float[] { -gwidth, -gheight })
+                .setFloat("threshold", 1.0f);
+
         selectedFilter = new FilterGroup(
                 luminanceFilter,
                 horizontalBlurFilter,
                 verticalBlurFilter,
-                sobelFilter);
+                sobelFilter,
+                suppressionFilter,
+                inclusionFilter);
 //
 //        selectedFilter = horizontalBlurFilter;
 
