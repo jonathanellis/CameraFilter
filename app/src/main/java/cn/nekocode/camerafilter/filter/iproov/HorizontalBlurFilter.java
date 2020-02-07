@@ -15,7 +15,7 @@ public class HorizontalBlurFilter extends CameraFilter {
         super(context);
 
         // Build shaders
-        program = MyGLUtils.buildProgram(Shaders.NO_FILTER_VERTEX_SHADER, Shaders.NO_FILTER_FRAGMENT_SHADER);
+        program = MyGLUtils.buildProgram(Shaders.NO_FILTER_VERTEX_SHADER, Shaders.HorizontalBlurShader);
     }
 
     @Override
@@ -25,8 +25,8 @@ public class HorizontalBlurFilter extends CameraFilter {
                 new int[]{cameraTexId},
                 new int[][]{});
 
-//        int location = GLES20.glGetUniformLocation(program, "h");
-//        GLES20.glUniform1f(location, 1f);
+        int location = GLES20.glGetUniformLocation(program, "h");
+        GLES20.glUniform1f(location, 0.005f);
 
         GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);
     }
