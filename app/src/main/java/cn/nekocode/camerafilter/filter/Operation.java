@@ -15,7 +15,6 @@
  */
 package cn.nekocode.camerafilter.filter;
 
-import android.content.Context;
 import android.opengl.GLES11Ext;
 import android.opengl.GLES20;
 import android.support.annotation.CallSuper;
@@ -27,11 +26,13 @@ import java.nio.FloatBuffer;
 import cn.nekocode.camerafilter.MyGLUtils;
 import cn.nekocode.camerafilter.R;
 import cn.nekocode.camerafilter.RenderBuffer;
+import cn.nekocode.camerafilter.filter.iproov.Shaders;
 
 /**
  * @author nekocode (nekocode.cn@gmail.com)
  */
-public abstract class CameraFilter {
+public abstract class Operation {
+
     static final float SQUARE_COORDS[] = {
             1.0f, -1.0f,
             -1.0f, -1.0f,
@@ -45,7 +46,9 @@ public abstract class CameraFilter {
             0.0f, 1.0f,
     };
     static FloatBuffer VERTEX_BUF, TEXTURE_COORD_BUF;
-    static int PROGRAM = 0;
+    static int BASE_PROGRAM = 0;
+    private int program;
+
 
     private static final int BUF_ACTIVE_TEX_UNIT = GLES20.GL_TEXTURE8;
     private static RenderBuffer CAMERA_RENDER_BUF;
@@ -61,7 +64,7 @@ public abstract class CameraFilter {
     final long START_TIME = System.currentTimeMillis();
     int iFrame = 0;
 
-    public CameraFilter(Context context) {
+    public Operation() {
         // Setup default Buffers
         if (VERTEX_BUF == null) {
             VERTEX_BUF = ByteBuffer.allocateDirect(SQUARE_COORDS.length * 4)
@@ -84,9 +87,11 @@ public abstract class CameraFilter {
             ROATED_TEXTURE_COORD_BUF.position(0);
         }
 
-        if (PROGRAM == 0) {
-            PROGRAM = MyGLUtils.buildProgram(context, R.raw.vertext, R.raw.original_rtt);
+        if (BASE_PROGRAM == 0) {
+            BASE_PROGRAM = MyGLUtils.buildProgram(Shaders.DEFAULT_VERTEX_SHADER, Shaders.DEFAULT_FRAG_SHADER);
         }
+
+
     }
 
     @CallSuper
@@ -104,18 +109,18 @@ public abstract class CameraFilter {
         }
 
         // Use shaders
-        GLES20.glUseProgram(PROGRAM);
+        GLES20.glUseProgram(BASE_PROGRAM);
 
-        int iChannel0Location = GLES20.glGetUniformLocation(PROGRAM, "inputImageTexture");
+        int iChannel0Location = GLES20.glGetUniformLocation(BASE_PROGRAM, "inputImageTexture");
         GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
         GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, textureId);
         GLES20.glUniform1i(iChannel0Location, 0);
 
-        int vPositionLocation = GLES20.glGetAttribLocation(PROGRAM, "position");
+        int vPositionLocation = GLES20.glGetAttribLocation(BASE_PROGRAM, "position");
         GLES20.glEnableVertexAttribArray(vPositionLocation);
         GLES20.glVertexAttribPointer(vPositionLocation, 2, GLES20.GL_FLOAT, false, 4 * 2, VERTEX_BUF);
 
-        int vTexCoordLocation = GLES20.glGetAttribLocation(PROGRAM, "inputTextureCoordinate");
+        int vTexCoordLocation = GLES20.glGetAttribLocation(BASE_PROGRAM, "inputTextureCoordinate");
         GLES20.glEnableVertexAttribArray(vTexCoordLocation);
         GLES20.glVertexAttribPointer(vTexCoordLocation, 2, GLES20.GL_FLOAT, false, 4 * 2, ROATED_TEXTURE_COORD_BUF);
 
@@ -142,7 +147,6 @@ public abstract class CameraFilter {
     static void setupShaderInputs(int program, FloatBuffer vertex, FloatBuffer textureCoord, int[] iResolution, int[] iChannels, int[][] iChannelResolutions) {
         GLES20.glUseProgram(program);
 
-//        int iResolutionLocation = GLES20.glGetUniformLocation(program, "uWindow");
 //        GLES20.glUniform3fv(iResolutionLocation, 1,
 //                FloatBuffer.wrap(new float[]{(float) iResolution[0], (float) iResolution[1], 1.0f}));
 //
@@ -182,7 +186,9 @@ public abstract class CameraFilter {
     }
 
     public static void release() {
-        PROGRAM = 0;
+        BASE_PROGRAM = 0;
         CAMERA_RENDER_BUF = null;
     }
+
+
 }

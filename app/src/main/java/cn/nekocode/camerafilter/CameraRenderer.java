@@ -22,7 +22,6 @@ import android.opengl.GLES11Ext;
 import android.opengl.GLES20;
 import android.util.Log;
 import android.util.Pair;
-import android.util.SparseArray;
 import android.view.TextureView;
 
 import java.io.IOException;
@@ -33,33 +32,10 @@ import javax.microedition.khronos.egl.EGLContext;
 import javax.microedition.khronos.egl.EGLDisplay;
 import javax.microedition.khronos.egl.EGLSurface;
 
-import cn.nekocode.camerafilter.filter.AsciiArtFilter;
-import cn.nekocode.camerafilter.filter.BasicDeformFilter;
-import cn.nekocode.camerafilter.filter.BlueorangeFilter;
-import cn.nekocode.camerafilter.filter.CameraFilter;
-import cn.nekocode.camerafilter.filter.ChromaticAberrationFilter;
-import cn.nekocode.camerafilter.filter.ContrastFilter;
-import cn.nekocode.camerafilter.filter.CrackedFilter;
-import cn.nekocode.camerafilter.filter.CrosshatchFilter;
-import cn.nekocode.camerafilter.filter.EMInterferenceFilter;
-import cn.nekocode.camerafilter.filter.EdgeDetectionFilter;
-import cn.nekocode.camerafilter.filter.JFAVoronoiFilter;
-import cn.nekocode.camerafilter.filter.LegofiedFilter;
-import cn.nekocode.camerafilter.filter.LichtensteinEsqueFilter;
-import cn.nekocode.camerafilter.filter.MappingFilter;
-import cn.nekocode.camerafilter.filter.MoneyFilter;
-import cn.nekocode.camerafilter.filter.NoiseWarpFilter;
-import cn.nekocode.camerafilter.filter.OriginalFilter;
-import cn.nekocode.camerafilter.filter.PixelizeFilter;
-import cn.nekocode.camerafilter.filter.PolygonizationFilter;
-import cn.nekocode.camerafilter.filter.RefractionFilter;
-import cn.nekocode.camerafilter.filter.TileMosaicFilter;
-import cn.nekocode.camerafilter.filter.TrianglesMosaicFilter;
-import cn.nekocode.camerafilter.filter.iproov.FilterGroup;
-import cn.nekocode.camerafilter.filter.iproov.HorizontalBlurFilter;
-import cn.nekocode.camerafilter.filter.iproov.LuminanceFilter;
-import cn.nekocode.camerafilter.filter.iproov.TransformationFilter;
-import cn.nekocode.camerafilter.filter.iproov.VerticalBlurFilter;
+import cn.nekocode.camerafilter.filter.Filter;
+import cn.nekocode.camerafilter.filter.Operation;
+import cn.nekocode.camerafilter.filter.FilterGroup;
+import cn.nekocode.camerafilter.filter.iproov.Shaders;
 
 /**
  * @author nekocode (nekocode.cn@gmail.com)
@@ -83,7 +59,7 @@ public class CameraRenderer implements Runnable, TextureView.SurfaceTextureListe
     private Camera camera;
     private SurfaceTexture cameraSurfaceTexture;
     private int cameraTextureId;
-    private CameraFilter selectedFilter;
+    private Operation selectedFilter;
 
     public CameraRenderer(Context context) {
         this.context = context;
@@ -108,7 +84,7 @@ public class CameraRenderer implements Runnable, TextureView.SurfaceTextureListe
         if (renderThread != null && renderThread.isAlive()) {
             renderThread.interrupt();
         }
-        CameraFilter.release();
+        Operation.release();
 
         return true;
     }
@@ -137,10 +113,25 @@ public class CameraRenderer implements Runnable, TextureView.SurfaceTextureListe
     public void run() {
         initGL(surfaceTexture);
 
-        selectedFilter = new FilterGroup(context,
-                new LuminanceFilter(context),
-                new HorizontalBlurFilter(context),
-                new VerticalBlurFilter(context));
+        Filter luminanceFilter = Filter.create(Shaders.NO_FILTER_VERTEX_SHADER, Shaders.LuminanceShader);
+
+        Filter horizontalBlurFilter = Filter.create(Shaders.NO_FILTER_VERTEX_SHADER, Shaders.HorizontalBlurShader)
+                .setFloat("h", 0.005f);
+
+        Filter verticalBlurFilter = Filter.create(Shaders.NO_FILTER_VERTEX_SHADER, Shaders.VerticalBlurShader)
+                .setFloat("v", 0.005f);
+
+        Filter sobelFilter = Filter.create(Shaders.NO_FILTER_VERTEX_SHADER, Shaders.SobelShader)
+                .setFloatVec2("uWindow", new float[] { -gwidth, -gheight })
+                .setFloat("threshold", 1.0f);
+
+//        selectedFilter = new FilterGroup(
+//                luminanceFilter,
+//                horizontalBlurFilter,
+//                verticalBlurFilter,
+//                sobelFilter);
+
+        selectedFilter = horizontalBlurFilter;
 
         selectedFilter.onAttach();
 

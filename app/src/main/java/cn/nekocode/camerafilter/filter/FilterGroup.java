@@ -1,23 +1,20 @@
-package cn.nekocode.camerafilter.filter.iproov;
+package cn.nekocode.camerafilter.filter;
 
-import android.content.Context;
 import android.opengl.GLES20;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
 import cn.nekocode.camerafilter.RenderBuffer;
-import cn.nekocode.camerafilter.filter.CameraFilter;
 
-public class FilterGroup extends CameraFilter {
+public class FilterGroup extends Operation {
 
-    ArrayList<CameraFilter> filters = new ArrayList<>();
+    ArrayList<Operation> filters = new ArrayList<>();
 
     private RenderBuffer bufA;
     private RenderBuffer bufB;
 
-    public FilterGroup(Context context, CameraFilter... filters) {
-        super(context);
+    public FilterGroup(Operation... filters) {
 
         this.filters.addAll(Arrays.asList(filters));
     }
@@ -32,7 +29,7 @@ public class FilterGroup extends CameraFilter {
         }
 
         for (int i = 0; i < filters.size(); i++) {
-            CameraFilter filter = filters.get(i);
+            Operation filter = filters.get(i);
 
             int inputTexId;
             RenderBuffer outBuf;
